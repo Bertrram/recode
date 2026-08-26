@@ -55,7 +55,9 @@ Set-StrictMode -Version Latest
 $PSNativeCommandUseErrorActionPreference = $false
 
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
-$PackageFamilyName = 'BertramBechLarsen.Recode'
+# The Identity Name from AppxManifest.xml, which is what Get-AppxPackage -Name
+# matches on. Not the package family name, which carries a publisher hash.
+$PackageIdentityName = 'BertramBechLarsen.Recode'
 
 if (-not $Architecture) {
     $Architecture = if ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64') { 'arm64' } else { 'x64' }
@@ -100,7 +102,7 @@ certificate and no elevation:
 if ($Uninstall) {
     Write-Stage 'Removing the packaged shell extension'
 
-    $installed = Get-AppxPackage -Name $PackageFamilyName -ErrorAction SilentlyContinue
+    $installed = Get-AppxPackage -Name $PackageIdentityName -ErrorAction SilentlyContinue
     if ($installed) {
         foreach ($package in $installed) {
             if ($PSCmdlet.ShouldProcess($package.PackageFullName, 'Remove package')) {
@@ -173,7 +175,7 @@ if ($PSCmdlet.ShouldProcess($PackagePath, 'Register package')) {
     Add-AppxPackage -Path $PackagePath -ExternalLocation $PayloadDirectory
 }
 
-$installed = Get-AppxPackage -Name $PackageFamilyName -ErrorAction SilentlyContinue
+$installed = Get-AppxPackage -Name $PackageIdentityName -ErrorAction SilentlyContinue
 
 Write-Stage 'Done'
 if ($installed) {

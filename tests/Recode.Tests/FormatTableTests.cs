@@ -119,6 +119,56 @@ public class FormatTableTests
     }
 
     [Fact]
+    public void A_formats_own_targets_leave_it_out()
+    {
+        Assert.True(Table.TryGetByExtension(".png", out var png));
+
+        var targets = Table.TargetsFor(png!).ToList();
+
+        Assert.DoesNotContain(targets, t => t.Format.Id == "png");
+        Assert.Contains(targets, t => t.Format.Id == "jpeg");
+        Assert.Contains(targets, t => t.Format.Id == "webp");
+    }
+
+    [Fact]
+    public void Both_jpeg_extensions_disappear_together()
+    {
+        // The exclusion is by format, not by extension. Offering a .jpg file a
+        // conversion to .jpeg would produce a copy under a different name, not
+        // a conversion.
+        Assert.True(Table.TryGetByExtension(".jpg", out var jpeg));
+
+        var targets = Table.TargetsFor(jpeg!).ToList();
+
+        Assert.DoesNotContain(targets, t => t.Extension == ".jpg");
+        Assert.DoesNotContain(targets, t => t.Extension == ".jpeg");
+        Assert.Contains(targets, t => t.Extension == ".png");
+    }
+
+    [Fact]
+    public void Both_menus_are_built_from_the_same_list()
+    {
+        // The registry menu excludes when it generates its keys. The packaged
+        // shell extension builds the full list and hides entries as the menu
+        // opens. Both call this, which is what keeps them showing the same
+        // formats.
+        foreach (var source in Table.Formats.Where(f => f.CanRead))
+        {
+            var targets = Table.TargetsFor(source).ToList();
+
+            Assert.NotEmpty(targets);
+            Assert.All(targets, t => Assert.NotEqual(source.Id, t.Format.Id));
+            Assert.All(targets, t => Assert.True(t.Format.CanWrite));
+        }
+    }
+
+    [Fact]
+    public void A_null_source_is_rejected()
+    {
+        Assert.Throws<ArgumentNullException>(() => Table.TargetsFor(null!).ToList());
+    }
+
+    [Fact]
     public void Heic_reports_kvazaar_rather_than_x265()
     {
         Assert.True(Table.TryGetByExtension(".heic", out var heic));
