@@ -31,29 +31,50 @@ tray icon, no telemetry, no settings to get wrong.
 ## Install
 
 Download the archive for your architecture from the
-[releases page](https://github.com/Bertrram/recode/releases), unpack it anywhere,
-and run:
+[releases page](https://github.com/Bertrram/recode/releases) and unpack it
+somewhere it can stay. Then pick one of two menus.
+
+### The classic menu, no administrator rights
 
 ```powershell
 pwsh -File tools\install-context-menu.ps1
 ```
 
-That writes to `HKEY_CURRENT_USER`. **No administrator rights are required.**
-Nothing is written outside your own user account, no service is installed, and
-nothing runs at startup.
+Writes to `HKEY_CURRENT_USER` and nothing else. No elevation, no certificate,
+no service, nothing at startup. On Windows 11 the entries appear under **Show
+more options**; on Windows 10 they are in the menu directly.
 
-To remove it:
+Remove it again with `tools\uninstall-context-menu.ps1`, which finds its keys by
+walking the registry rather than by reading a list, so it also cleans up after
+older versions.
+
+### The first Windows 11 menu, administrator rights required
 
 ```powershell
-pwsh -File tools\uninstall-context-menu.ps1
+pwsh -File tools\build-package.ps1
+pwsh -File tools\install-shell-extension.ps1   # elevated
 ```
 
-The uninstaller finds its keys by walking the registry rather than by reading a
-list, so it also cleans up after older versions.
+This puts **Convert to** in the menu that opens on a right click, alongside
+Paint and the other packaged entries, rather than behind "Show more options".
 
-On Windows 11 the entries appear under **Show more options**. Reaching the top
-level of the Windows 11 menu requires a packaged shell extension, which is
-tracked separately.
+It costs elevation, once. That menu only accepts a COM handler declared by a
+packaged application, Windows only registers a package signed by a certificate
+the machine trusts, and trusting a certificate is machine wide. There is no
+per user route to it and no registry key for it.
+
+The install script does exactly two things: adds one certificate to Local
+Machine\Trusted People, and registers the package pointing at the folder you
+unpacked. `-Uninstall` removes both. **The folder has to stay where it is**, as
+the package points at it rather than copying from it.
+
+If the entry does not appear, this says which precondition failed:
+
+```powershell
+pwsh -File tools\diagnose-shell-extension.ps1
+```
+
+Either menu works on its own, and having both installed is harmless.
 
 The source format is left out of its own submenu. Selecting several files at
 once works, including files of different formats.
@@ -165,9 +186,11 @@ JPEG, PNG, BMP, GIF and WebP have no known active patent encumbrance.
 
 An honest list of what this version does not do.
 
-**Windows 11 menu placement.** The entries sit under "Show more options", not in
-the first menu. The top level requires an `IExplorerCommand` handler in a
-packaged application, which is more machinery than a registry key.
+**The first Windows 11 menu needs elevation once.** Not because Recode wants it,
+but because that menu only accepts a packaged, signed handler, and trusting a
+self signed certificate is a machine wide operation. A real code signing
+certificate would remove the elevation but not the packaging. The classic menu
+needs neither and does the same job.
 
 **Metadata is not carried over.** EXIF orientation is applied to the pixels, but
 nothing else survives the conversion. Capture date, camera model, GPS location,
@@ -246,7 +269,34 @@ dotnet publish src\Recode.App -c Release -r win-arm64 --self-contained -o dist\a
 ```
 
 Use `win-x64` for the other architecture. The published folder holds
-`recode.exe` and the six native DLLs, which is everything needed to run.
+`recode.exe` and the six native DLLs, which is everything the classic menu and
+the command line need.
+
+### Shell extension and package
+
+Only needed for the first Windows 11 menu.
+
+```powershell
+pwsh -File tools\build-shell.ps1      # native COM handler, next to recode.exe
+pwsh -File tools\build-package.ps1    # sparse MSIX, signed
+```
+
+`Recode.Shell` is compiled ahead of time into a native DLL rather than a managed
+assembly. Explorer loads it through a COM surrogate on every right click, and
+starting a runtime in that process is something a user would feel. That
+constraint is also why the format table lives in its own `Recode.Formats`
+assembly: the extension and the converter need the same table, but only one of
+them can afford a dependency on WPF.
+
+`build-shell.ps1` exists rather than a bare `dotnet publish` because ahead of
+time compilation needs the MSVC linker, and the compiler locates it through
+`vswhere`. Neither is on `PATH` in an ordinary shell, and the failure without
+them names the wrong problem.
+
+`build-package.ps1` creates a self signed certificate on first run and reuses it
+afterwards. The file type list in the manifest is generated from
+`formats.json`, so the packaged menu and the registry menu cannot offer
+different formats.
 
 `tools\make-icon.ps1` renders `assets/Recode.svg` and `assets/Recode-small.svg`
 into a multi resolution `app.ico`. The simplified variant is used at 16, 20 and
@@ -269,14 +319,22 @@ first.
 
 ```
 formats.json               the format table, single source of truth
-src/Recode.Core            format table, codecs, conversion, registry generation
+src/Recode.Formats         the format table, no Windows or WPF dependency
+src/Recode.Core            codecs, conversion, registry generation
 src/Recode.App             command line and the support window
+src/Recode.Shell           IExplorerCommand handler, compiled ahead of time
+packaging/                 the MSIX manifest template
 tests/Recode.Tests         xUnit tests and small real test images
-tools/build-natives.ps1    builds the bundled libraries from source
-tools/make-icon.ps1        renders the SVG logos into app.ico
-tools/install-context-menu.ps1
-tools/uninstall-context-menu.ps1
 third-party-licenses/      licences for the bundled libraries
+
+tools/build-natives.ps1            builds the bundled libraries from source
+tools/build-shell.ps1              compiles the shell extension
+tools/build-package.ps1            builds and signs the sparse MSIX
+tools/make-icon.ps1                renders the SVG logos into app.ico
+tools/install-context-menu.ps1     classic menu, per user
+tools/uninstall-context-menu.ps1
+tools/install-shell-extension.ps1  first Windows 11 menu, needs elevation
+tools/diagnose-shell-extension.ps1 works out why the packaged menu is missing
 ```
 
 Backends sit behind a common `IImageCodec`. The conversion logic does not know

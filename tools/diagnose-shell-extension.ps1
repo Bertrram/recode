@@ -17,7 +17,11 @@
 [CmdletBinding()]
 param(
     [ValidateSet('arm64', 'x64')]
-    [string] $Architecture
+    [string] $Architecture,
+
+    # The folder the package was installed from. Only needed when it is not the
+    # default, because Windows does not report it back.
+    [string] $PayloadDirectory
 )
 
 $ErrorActionPreference = 'Continue'
@@ -30,6 +34,9 @@ $Clsid = '018E5409-E5B6-4961-8779-67741A425A20'
 
 if (-not $Architecture) {
     $Architecture = if ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64') { 'arm64' } else { 'x64' }
+}
+if (-not $PayloadDirectory) {
+    $PayloadDirectory = Join-Path $RepoRoot "dist\$Architecture"
 }
 
 $problems = [System.Collections.Generic.List[string]]::new()
@@ -83,18 +90,18 @@ if ($package) {
 
 # ---------------------------------------------------------------------------
 
-$external = Join-Path $RepoRoot "dist\$Architecture"
-if ($package -and $package.PSObject.Properties.Name -contains 'InstallLocation' -and $package.InstallLocation) {
-    $external = $package.InstallLocation
-}
-
-$payloadOk = (Test-Path (Join-Path $external 'recode.exe')) -and
-             (Test-Path (Join-Path $external 'Recode.Shell.dll'))
+# Get-AppxPackage reports InstallLocation, which for a sparse package is the
+# manifest folder under WindowsApps rather than the folder holding the
+# binaries. The external location is not exposed at all, so this checks the
+# folder the package was installed from. Pass -PayloadDirectory if it was
+# installed from somewhere else.
+$payloadOk = (Test-Path (Join-Path $PayloadDirectory 'recode.exe')) -and
+             (Test-Path (Join-Path $PayloadDirectory 'Recode.Shell.dll'))
 
 Report -Ok $payloadOk `
-    -Check "Payload present at the external location" `
-    -Detail $external `
-    -Fix "The folder the package points at has moved or lost files. Reinstall with tools\install-shell-extension.ps1, or rebuild the payload."
+    -Check "Payload present where it is expected" `
+    -Detail $PayloadDirectory `
+    -Fix "recode.exe or Recode.Shell.dll is missing from $PayloadDirectory. If the package was installed from a different folder, pass -PayloadDirectory. Otherwise rebuild the payload."
 
 # ---------------------------------------------------------------------------
 
