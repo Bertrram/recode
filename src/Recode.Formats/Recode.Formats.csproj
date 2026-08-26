@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!--
+      Plain net8.0, no WPF and no Windows specific API. This assembly is
+      compiled ahead of time into the shell extension, which loads inside a COM
+      surrogate where a full runtime and a WPF dependency would be dead weight.
+
+      That constraint is the reason the format table lives here rather than in
+      Recode.Core: the context menu and the converter need the same table, but
+      only one of them can afford WPF.
+    -->
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>Recode.Core.Formats</RootNamespace>
+    <AssemblyName>Recode.Formats</AssemblyName>
+
+    <!-- Enforced by the compiler, so an AOT hostile change is caught here. -->
+    <IsAotCompatible>true</IsAotCompatible>
+    <IsTrimmable>true</IsTrimmable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\formats.json" LogicalName="Recode.Core.formats.json" />
+  </ItemGroup>
+
+</Project>

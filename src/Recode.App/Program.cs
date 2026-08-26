@@ -44,6 +44,7 @@ internal static class Program
             CommandMode.List => ShowList(table),
             CommandMode.About => ShowAbout(table),
             CommandMode.EmitRegistry => EmitRegistry(table),
+            CommandMode.EmitExtensions => EmitExtensions(table),
             CommandMode.Convert => Convert(table, options),
             _ => ShowHelp(options)
         };
@@ -219,6 +220,21 @@ internal static class Program
         });
 
         Console.WriteLine(json);
+        return ExitSuccess;
+    }
+
+    /// <summary>
+    /// Every extension the context menu should attach to, one per line.
+    /// </summary>
+    private static int EmitExtensions(FormatTable table)
+    {
+        ConsoleAttach.TryAttach();
+
+        foreach (var extension in table.ReadableExtensions)
+        {
+            Console.WriteLine(extension);
+        }
+
         return ExitSuccess;
     }
 

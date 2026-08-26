@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -7,16 +6,15 @@ namespace Recode.Core.Formats;
 /// <summary>
 /// Reads formats.json into a <see cref="FormatTable"/>.
 /// </summary>
+/// <remarks>
+/// Deserialisation goes through a source generated context rather than
+/// reflection. The shell extension is compiled ahead of time, where reflection
+/// based serialisation either fails outright or survives only by keeping the
+/// whole reflection stack alive.
+/// </remarks>
 public static class FormatTableLoader
 {
     private const string ResourceName = "Recode.Core.formats.json";
-
-    private static readonly JsonSerializerOptions Options = new()
-    {
-        PropertyNameCaseInsensitive = true,
-        ReadCommentHandling = JsonCommentHandling.Skip,
-        AllowTrailingCommas = true
-    };
 
     private static FormatTable? _embedded;
 
@@ -45,7 +43,7 @@ public static class FormatTableLoader
         DocumentDto? document;
         try
         {
-            document = JsonSerializer.Deserialize<DocumentDto>(json, Options);
+            document = JsonSerializer.Deserialize(json, FormatTableJsonContext.Default.DocumentDto);
         }
         catch (JsonException ex)
         {
@@ -127,14 +125,14 @@ public static class FormatTableLoader
         return value;
     }
 
-    private sealed class DocumentDto
+    internal sealed class DocumentDto
     {
         public int SchemaVersion { get; set; }
         public List<BackendDto>? Backends { get; set; }
         public List<FormatDto>? Formats { get; set; }
     }
 
-    private sealed class BackendDto
+    internal sealed class BackendDto
     {
         public string? Id { get; set; }
         public string? DisplayName { get; set; }
@@ -143,7 +141,7 @@ public static class FormatTableLoader
         public List<string>? Libraries { get; set; }
     }
 
-    private sealed class FormatDto
+    internal sealed class FormatDto
     {
         public string? Id { get; set; }
         public string? DisplayName { get; set; }
@@ -158,4 +156,22 @@ public static class FormatTableLoader
         public bool SupportsAlpha { get; set; }
         public string? Compression { get; set; }
     }
+}
+
+/// <summary>
+/// Source generated deserialisation for formats.json.
+/// </summary>
+/// <remarks>
+/// PropertyNameCaseInsensitive so that the file can stay in the camelCase it is
+/// written in. ReadCommentHandling because formats.json carries an explanatory
+/// header, and a format table nobody can annotate is a format table nobody
+/// maintains.
+/// </remarks>
+[JsonSourceGenerationOptions(
+    PropertyNameCaseInsensitive = true,
+    ReadCommentHandling = JsonCommentHandling.Skip,
+    AllowTrailingCommas = true)]
+[JsonSerializable(typeof(FormatTableLoader.DocumentDto))]
+internal sealed partial class FormatTableJsonContext : JsonSerializerContext
+{
 }

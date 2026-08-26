@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Template for the sparse package that puts Recode in the first Windows 11
+  context menu.
+
+  Sparse means the package carries this manifest and the logo images, while
+  recode.exe, Recode.Shell.dll and the native libraries stay in an ordinary
+  folder outside it. That is what AllowExternalContent below declares, and it
+  is why installation is a folder plus a registration rather than a copy into
+  WindowsApps.
+
+  The placeholders in double braces are filled in by tools/build-package.ps1.
+  FILE_TYPES in particular comes from formats.json, read out of recode.exe by
+  its emit-extensions mode, so the packaged menu and the registry menu cannot
+  list different formats.
+-->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
+  xmlns:desktop4="http://schemas.microsoft.com/appx/manifest/desktop/windows10/4"
+  xmlns:desktop5="http://schemas.microsoft.com/appx/manifest/desktop/windows10/5"
+  IgnorableNamespaces="uap uap10 rescap com desktop4 desktop5">
+
+  <!--
+    Publisher must match the signing certificate's subject exactly, character
+    for character. A mismatch fails installation with a message that does not
+    say which of the two is wrong.
+  -->
+  <Identity
+    Name="{{IDENTITY_NAME}}"
+    Publisher="{{PUBLISHER}}"
+    Version="{{VERSION}}"
+    ProcessorArchitecture="{{ARCHITECTURE}}" />
+
+  <Properties>
+    <DisplayName>Recode</DisplayName>
+    <PublisherDisplayName>{{PUBLISHER_DISPLAY_NAME}}</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+
+    <!-- This is what makes it a sparse package. -->
+    <uap10:AllowExternalContent>true</uap10:AllowExternalContent>
+  </Properties>
+
+  <Resources>
+    <Resource Language="en-us" />
+  </Resources>
+
+  <Dependencies>
+    <!--
+      22000 is Windows 11. The context menu extension category below does not
+      exist before it. Windows 10 users get the registry menu instead, which is
+      installed separately and needs no package at all.
+    -->
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.22000.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+
+    <!--
+      Required by RuntimeBehavior="win32App" below. It means the application
+      reads and writes the real registry and the real file system rather than
+      a per package virtualised view of them, which is the only way a converter
+      can write a file next to the one the user right clicked.
+    -->
+    <rescap:Capability Name="unvirtualizedResources" />
+  </Capabilities>
+
+  <Applications>
+    <Application
+      Id="Recode"
+      Executable="recode.exe"
+      uap10:TrustLevel="mediumIL"
+      uap10:RuntimeBehavior="win32App">
+
+      <!--
+        AppListEntry="none" keeps Recode out of the Start menu. It is a context
+        menu action, not an application anyone wants to launch from a tile.
+      -->
+      <uap:VisualElements
+        DisplayName="Recode"
+        Description="Convert images between formats"
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png"
+        AppListEntry="none" />
+
+      <Extensions>
+        <!--
+          A surrogate server, so the extension runs in its own process rather
+          than inside explorer.exe. A fault in the menu then costs a process
+          nobody sees instead of the user's whole desktop.
+        -->
+        <com:Extension Category="windows.comServer">
+          <com:ComServer>
+            <com:SurrogateServer DisplayName="Recode context menu">
+              <com:Class Id="{{CLSID}}" Path="Recode.Shell.dll" ThreadingModel="STA" />
+            </com:SurrogateServer>
+          </com:ComServer>
+        </com:Extension>
+
+        <desktop4:Extension Category="windows.fileExplorerContextMenus">
+          <desktop4:FileExplorerContextMenus>
+{{FILE_TYPES}}
+          </desktop4:FileExplorerContextMenus>
+        </desktop4:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+</Package>

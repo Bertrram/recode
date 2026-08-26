@@ -95,6 +95,10 @@ public static class CommandLineParser
                     explicitMode = CommandMode.EmitRegistry;
                     continue;
 
+                case "--emit-extensions":
+                    explicitMode = CommandMode.EmitExtensions;
+                    continue;
+
                 case "--help":
                 case "-h":
                 case "-?":

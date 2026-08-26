@@ -1,3 +1,5 @@
+<img src="docs/icon.png" alt="" width="104" align="right">
+
 # Recode
 
 Convert images between formats from the Explorer context menu on Windows.
@@ -5,9 +7,13 @@ Convert images between formats from the Explorer context menu on Windows.
 Right click one or more image files, pick a target format, and the converted
 files appear next to the originals. The originals are never deleted.
 
-Everything needed is included. There is nothing to download from the Microsoft
-Store, no codec pack to install, and no account to create. That is the point of
-the program.
+Nine formats, including the ones Windows makes difficult: HEIC from an iPhone,
+AVIF from the web, WebP from anywhere. Everything needed is bundled. There is
+nothing to fetch from the Microsoft Store.
+
+<p align="center">
+  <img src="docs/context-menu.png" alt="The Convert to submenu open in Explorer, listing JPG, JPEG, PNG, BMP, TIF, TIFF, GIF, HEIF, AVIF and WebP" width="620">
+</p>
 
 ## The problem
 
@@ -49,31 +55,8 @@ On Windows 11 the entries appear under **Show more options**. Reaching the top
 level of the Windows 11 menu requires a packaged shell extension, which is
 tracked separately.
 
-The menu looks like this:
-
-```
-Convert to  >   JPG
-                JPEG
-                PNG
-                BMP
-                TIF
-                TIFF
-                GIF
-                HEIF
-                AVIF
-                WebP
-                ----------------
-                Format support
-```
-
 The source format is left out of its own submenu. Selecting several files at
 once works, including files of different formats.
-
-<!--
-  To replace the block above with a real screenshot, save one as
-  docs/context-menu.png and put this line here instead:
-  ![The context menu](docs/context-menu.png)
--->
 
 
 ### Unsigned binaries
@@ -302,4 +285,9 @@ adding a format to a table change rather than a code change.
 
 ## Licence
 
-MIT. See [LICENSE](LICENSE).
+Recode is MIT licensed. See [LICENSE](LICENSE).
+
+The bundled native libraries are not, and keep their own terms. libheif and
+libde265 are LGPL-3.0 and ship as separate, replaceable DLLs loaded at run time,
+which is what lets this project stay MIT. Full texts and a longer explanation
+are in [third-party-licenses](third-party-licenses/).

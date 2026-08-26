@@ -52,20 +52,15 @@ public sealed class ContextMenuGenerator
         var keys = new List<RegistryKeySpec>();
         var roots = new List<string>();
 
-        var targets = _table.WritableTargets.ToList();
-
         foreach (var format in _table.Formats.Where(f => f.CanRead))
         {
+            var submenu = _table.TargetsFor(format).ToList();
+
             foreach (var extension in format.Extensions)
             {
                 var verbKey = VerbKeyFor(extension);
                 roots.Add(verbKey);
                 keys.Add(BuildVerbKey(verbKey));
-
-                var submenu = targets
-                    .Where(t => !string.Equals(t.Format.Id, format.Id, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-
                 keys.AddRange(BuildSubmenu(verbKey, submenu));
             }
         }

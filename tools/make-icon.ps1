@@ -35,7 +35,12 @@
 [CmdletBinding()]
 param(
     [string] $Output,
-    [string] $PngDirectory
+    [string] $PngDirectory,
+
+    # Also write the logo images an MSIX package needs, into this folder.
+    # Used by tools/build-package.ps1 so the packaged shell extension shows the
+    # same mark as the executable, rendered from the same SVG.
+    [string] $PackageAssets
 )
 
 $ErrorActionPreference = 'Stop'
@@ -556,4 +561,34 @@ Write-Host ""
 Write-Host "Wrote $Output ($((Get-Item $Output).Length) bytes, $($frames.Count) sizes)"
 if ($PngDirectory) {
     Write-Host "PNG previews in $PngDirectory"
+}
+
+if ($PackageAssets) {
+    New-Item -ItemType Directory -Force -Path $PackageAssets | Out-Null
+
+    # The names are fixed by the MSIX schema. The scale suffixed variants let
+    # Windows pick a sharp image rather than resampling one, which is visible
+    # in the Start menu and the app list.
+    $packageLogos = @(
+        @{ Name = 'Square44x44Logo.png';              Size = 44 },
+        @{ Name = 'Square44x44Logo.targetsize-16.png'; Size = 16 },
+        @{ Name = 'Square44x44Logo.targetsize-24.png'; Size = 24 },
+        @{ Name = 'Square44x44Logo.targetsize-32.png'; Size = 32 },
+        @{ Name = 'Square44x44Logo.targetsize-48.png'; Size = 48 },
+        @{ Name = 'Square44x44Logo.scale-200.png';     Size = 88 },
+        @{ Name = 'Square150x150Logo.png';             Size = 150 },
+        @{ Name = 'Square150x150Logo.scale-200.png';   Size = 300 },
+        @{ Name = 'StoreLogo.png';                     Size = 50 }
+    )
+
+    Write-Host ""
+    Write-Host "Package assets:"
+
+    foreach ($logo in $packageLogos) {
+        $drawing = if ($logo.Size -le 24) { $smallDrawing } else { $fullDrawing }
+        $bitmap = Render-Frame -Drawing $drawing -Size $logo.Size
+        $path = Join-Path $PackageAssets $logo.Name
+        [System.IO.File]::WriteAllBytes($path, (ConvertTo-Png $bitmap))
+        Write-Host ("  {0,-36} {1,3} px" -f $logo.Name, $logo.Size)
+    }
 }

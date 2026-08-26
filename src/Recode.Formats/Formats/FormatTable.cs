@@ -83,6 +83,26 @@ public sealed class FormatTable
     public IEnumerable<TargetFormat> WritableTargets =>
         Formats.Where(f => f.CanWrite).SelectMany(f => f.Extensions.Select(e => new TargetFormat(f, e)));
 
+    /// <summary>
+    /// The destinations to offer when converting from <paramref name="source"/>.
+    /// </summary>
+    /// <remarks>
+    /// The source's own format is left out. Excluded by format rather than by
+    /// extension, so a .jpg file is offered neither .jpg nor .jpeg: they are the
+    /// same encoder, and an entry that produces a copy under a different
+    /// extension is not a conversion.
+    ///
+    /// Both the registry menu and the packaged shell extension call this, so
+    /// the two menus cannot drift apart.
+    /// </remarks>
+    public IEnumerable<TargetFormat> TargetsFor(ImageFormat source)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+
+        return WritableTargets.Where(t =>
+            !string.Equals(t.Format.Id, source.Id, StringComparison.OrdinalIgnoreCase));
+    }
+
     public BackendDefinition GetBackend(string backendId)
     {
         if (_backendsById.TryGetValue(backendId, out var backend))

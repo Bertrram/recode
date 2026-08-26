@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>Recode.Shell</RootNamespace>
+    <AssemblyName>Recode.Shell</AssemblyName>
+
+    <!--
+      A native DLL, not a managed assembly.
+
+      Explorer loads this through a COM surrogate on every right click. A
+      managed build would need a runtime started in that process before the
+      menu could be drawn, and the user would feel it. Compiled ahead of time
+      there is no runtime to start.
+
+      It also means this assembly cannot reference Recode.Core, which depends on
+      WPF. That is why the format table lives in Recode.Formats.
+    -->
+    <PublishAot>true</PublishAot>
+    <NativeLib>Shared</NativeLib>
+    <IsAotCompatible>true</IsAotCompatible>
+
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <!-- The exports are declared by hand in ClassFactory.cs. -->
+    <EnableComHosting>false</EnableComHosting>
+
+    <!-- Smaller and faster to load; there is no exception text to read here anyway. -->
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <UseSystemResourceKeys>true</UseSystemResourceKeys>
+    <StackTraceSupport>false</StackTraceSupport>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Recode.Formats\Recode.Formats.csproj" />
+  </ItemGroup>
+
+</Project>

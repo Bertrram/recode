@@ -19,7 +19,14 @@ public enum CommandMode
     /// script so that the keys come from the format table rather than from a
     /// second copy of the list kept in PowerShell.
     /// </summary>
-    EmitRegistry
+    EmitRegistry,
+
+    /// <summary>
+    /// Print every readable file extension, one per line. Used by the packaging
+    /// script to write the file type list into AppxManifest.xml, for the same
+    /// reason: one list, in formats.json, not two.
+    /// </summary>
+    EmitExtensions
 }
 
 public sealed record CommandLineOptions

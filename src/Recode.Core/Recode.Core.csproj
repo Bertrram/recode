@@ -18,10 +18,10 @@
 
   <ItemGroup>
     <!--
-      The format table is compiled in rather than read from disk, so it cannot
-      go missing or drift out of sync with the binary that uses it.
+      The format table lives in its own assembly because the shell extension
+      needs it too and cannot take a dependency on WPF.
     -->
-    <EmbeddedResource Include="..\..\formats.json" LogicalName="Recode.Core.formats.json" />
+    <ProjectReference Include="..\Recode.Formats\Recode.Formats.csproj" />
   </ItemGroup>
 
   <ItemGroup>
