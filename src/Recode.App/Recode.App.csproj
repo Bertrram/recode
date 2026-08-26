@@ -1,0 +1,118 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>Recode.App</RootNamespace>
+
+    <!-- The command is "recode", so the executable is recode.exe. -->
+    <AssemblyName>recode</AssemblyName>
+
+    <!--
+      WinExe rather than Exe. A console application launched from a context menu
+      flashes a console window on screen for every conversion. The console is
+      recovered at run time instead, by attaching to the parent process, so
+      running recode from a terminal still prints.
+    -->
+    <OutputType>WinExe</OutputType>
+    <UseWPF>true</UseWPF>
+
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+
+    <!--
+      Self contained, so there is nothing to install and no runtime to chase.
+      Not trimmed: WPF does not survive trimming, and the download size is not
+      the constraint here.
+    -->
+    <SelfContained>true</SelfContained>
+    <PublishTrimmed>false</PublishTrimmed>
+
+    <!--
+      One executable rather than the couple of hundred files a self contained
+      WPF build produces by default. What lands in the folder is recode.exe,
+      app.ico and the bundled native libraries, which is what a user can
+      reasonably be asked to copy somewhere.
+
+      Compression is left off deliberately. It would roughly halve the size on
+      disk at the cost of decompressing on every start, and this program is
+      started once per conversion from a context menu, where start up time is
+      the thing the user actually feels.
+    -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>false</EnableCompressionInSingleFile>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <!--
+    Which set of native libraries to copy. Falls back to the machine's own
+    architecture when no runtime identifier is given, so that plain
+    "dotnet build" during development produces something that runs.
+  -->
+  <PropertyGroup>
+    <NativeArch Condition="'$(RuntimeIdentifier)' == 'win-arm64'">arm64</NativeArch>
+    <NativeArch Condition="'$(RuntimeIdentifier)' == 'win-x64'">x64</NativeArch>
+    <NativeArch Condition="'$(NativeArch)' == '' and '$(PROCESSOR_ARCHITECTURE)' == 'ARM64'">arm64</NativeArch>
+    <NativeArch Condition="'$(NativeArch)' == ''">x64</NativeArch>
+    <NativeDirectory>$(MSBuildThisFileDirectory)..\..\native\$(NativeArch)</NativeDirectory>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Recode.Core\Recode.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      Built by tools/build-natives.ps1 and never committed. They sit beside the
+      executable rather than in a runtimes subfolder, because that is where the
+      loader looks and where a user can see them.
+    -->
+    <!--
+      ExcludeFromSingleFile is required, not cosmetic. libheif and libde265 are
+      LGPL, and the licence is satisfied here by shipping them as replaceable
+      shared libraries that the program loads at run time. Swept into the single
+      file bundle they would stop being replaceable, and the loader would not
+      find them on disk either.
+    -->
+    <None Include="$(NativeDirectory)\*.dll"
+          Link="%(Filename)%(Extension)"
+          CopyToOutputDirectory="PreserveNewest"
+          ExcludeFromSingleFile="true"
+          Visible="false" />
+
+    <None Include="$(MSBuildThisFileDirectory)..\..\third-party-licenses\**\*"
+          Link="third-party-licenses\%(RecursiveDir)%(Filename)%(Extension)"
+          CopyToOutputDirectory="PreserveNewest"
+          Visible="false" />
+  </ItemGroup>
+
+  <!--
+    app.ico is generated from the SVG logos by tools/make-icon.ps1 and is not
+    committed, so a fresh clone does not have it yet. Setting ApplicationIcon to
+    a file that does not exist fails the build, which would be a poor welcome.
+    The icon is applied when it is there and a warning is issued when it is not.
+  -->
+  <PropertyGroup>
+    <RecodeIconPath>$(MSBuildThisFileDirectory)..\..\assets\app.ico</RecodeIconPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="Exists('$(RecodeIconPath)')">
+    <ApplicationIcon>$(RecodeIconPath)</ApplicationIcon>
+  </PropertyGroup>
+
+  <Target Name="WarnAboutMissingIcon" BeforeTargets="Build" Condition="!Exists('$(RecodeIconPath)')">
+    <Warning Text="assets/app.ico is missing, so recode.exe will have the default icon and the context menu entries will have no icon. Run: pwsh -File tools/make-icon.ps1" />
+  </Target>
+
+  <!--
+    A build without the native libraries still produces a working executable:
+    JPEG, PNG, BMP, TIFF and GIF go through WIC and need nothing bundled. Only
+    HEIC, HEIF, AVIF and WebP would be unavailable, and the support window says
+    so. That is a warning, not an error.
+  -->
+  <Target Name="WarnAboutMissingNatives" BeforeTargets="Build">
+    <Warning Condition="!Exists('$(NativeDirectory)')"
+             Text="No native libraries for $(NativeArch) in $(NativeDirectory). HEIC, HEIF, AVIF and WebP will be unavailable. Run tools/build-natives.ps1 -Architecture $(NativeArch) to build them." />
+  </Target>
+
+</Project>

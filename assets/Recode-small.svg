@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  Simplified mark for small icon sizes.
+
+  The full logo carries two photo tiles, each with a sun and two mountain
+  ridges, plus two curved conversion arrows. At 16 and 20 pixels none of that
+  survives: the arrow strokes land under one pixel wide and the mountains turn
+  to noise. Explorer draws the context menu at 16, so a version built for that
+  size is not optional.
+
+  What is kept: the two overlapping tiles, the blue palette, and a single sun
+  disc so the tiles still read as pictures rather than as blank cards. What is
+  dropped: both arrows, both mountain ridges, all glows and shadows, and the
+  large transparent margin around the original artwork.
+
+  Used for 16, 20 and 24 pixels. Recode.svg is used from 32 upwards.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="backTile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6ee0f7"/>
+      <stop offset="1" stop-color="#1687e8"/>
+    </linearGradient>
+    <linearGradient id="frontTile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1b8ef1"/>
+      <stop offset="1" stop-color="#0447b8"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="3" y="4" width="37" height="35" rx="7" fill="url(#backTile)"/>
+  <rect x="24" y="25" width="37" height="35" rx="7" fill="url(#frontTile)"/>
+  <circle cx="35" cy="36" r="5.5" fill="#d6f2ff"/>
+</svg>

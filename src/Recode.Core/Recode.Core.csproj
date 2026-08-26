@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>Recode.Core</RootNamespace>
+    <AssemblyName>Recode.Core</AssemblyName>
+
+    <!--
+      WPF is referenced for one reason: System.Windows.Media.Imaging is the
+      managed wrapper around the Windows Imaging Component. Using it keeps the
+      WIC backend free of hand written COM interop and free of NuGet packages.
+    -->
+    <UseWPF>true</UseWPF>
+
+    <!-- libheif and libwebp are called through function pointers. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      The format table is compiled in rather than read from disk, so it cannot
+      go missing or drift out of sync with the binary that uses it.
+    -->
+    <EmbeddedResource Include="..\..\formats.json" LogicalName="Recode.Core.formats.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Recode.Tests" />
+  </ItemGroup>
+
+</Project>

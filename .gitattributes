@@ -1,0 +1,27 @@
+# Normalise line endings so a checkout on another machine does not show every
+# file as modified.
+
+* text=auto
+
+# Windows tooling is happier with CRLF for these.
+*.ps1   text eol=crlf
+*.psm1  text eol=crlf
+*.cmd   text eol=crlf
+*.bat   text eol=crlf
+*.sln   text eol=crlf
+
+# Never touched.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.heic  binary
+*.heif  binary
+*.avif  binary
+*.webp  binary
+*.gif   binary
+*.bmp   binary
+*.tif   binary
+*.tiff  binary
+*.ico   binary
+*.dll   binary
+*.exe   binary

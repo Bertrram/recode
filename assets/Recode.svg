@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1254" height="1254" viewBox="0 0 1254 1254">
+  <defs>
+    <linearGradient id="backCard" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#58d9f5"/>
+      <stop offset="0.48" stop-color="#26b9f2"/>
+      <stop offset="1" stop-color="#1687e8"/>
+    </linearGradient>
+    <linearGradient id="frontCard" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#188cf0"/>
+      <stop offset="0.55" stop-color="#0969e7"/>
+      <stop offset="1" stop-color="#0755cf"/>
+    </linearGradient>
+    <linearGradient id="mountainDark" x1="0" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#0e67d8"/>
+      <stop offset="1" stop-color="#0343b5"/>
+    </linearGradient>
+    <linearGradient id="mountainDark2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#075cce"/>
+      <stop offset="1" stop-color="#063cab"/>
+    </linearGradient>
+    <linearGradient id="mountainLight" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#84e4fb"/>
+      <stop offset="1" stop-color="#5ba8f4"/>
+    </linearGradient>
+    <linearGradient id="sun" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f6ffff"/>
+      <stop offset="1" stop-color="#bfeeff"/>
+    </linearGradient>
+    <linearGradient id="arrow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#20d8f2"/>
+      <stop offset="1" stop-color="#0d7ef2"/>
+    </linearGradient>
+    <linearGradient id="arrow2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#12bdf4"/>
+      <stop offset="1" stop-color="#0e6ee8"/>
+    </linearGradient>
+    <filter id="softGlow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="30" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.03  0 0 0 0 0.60  0 0 0 0 1  0 0 0 0.52 0"/>
+    </filter>
+    <filter id="blueGlow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="18" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.02  0 0 0 0 0.55  0 0 0 0 1  0 0 0 0.65 0"/>
+    </filter>
+    <filter id="shadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8" result="b"/>
+      <feOffset dy="6" result="o"/>
+      <feColorMatrix in="o" type="matrix" values="0 0 0 0 0 0 0 0 0 0.10 0 0 0 0 0.38 0 0 0 0.45 0" result="s"/>
+      <feMerge><feMergeNode in="s"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="backClip"><rect x="372" y="380" width="312" height="297" rx="29"/></clipPath>
+    <clipPath id="frontClip"><rect x="548" y="554" width="331" height="307" rx="29"/></clipPath>
+  </defs>
+
+  <!-- subtle Fluent blue glow, following the actual glyph rather than a circular halo -->
+  <g opacity="0.48" filter="url(#blueGlow)">
+    <rect x="372" y="380" width="312" height="297" rx="29" fill="#17baf5"/>
+    <rect x="548" y="554" width="331" height="307" rx="29" fill="#087eef"/>
+    <path d="M730 412 H774 C809 412 832 436 832 468 V491" fill="none" stroke="#0b9cf4" stroke-width="48" stroke-linecap="round"/>
+    <path d="M789 491 L831 535 L876 491" fill="none" stroke="#0b9cf4" stroke-width="42" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M493 815 H461 C438 815 419 800 419 777 V744" fill="none" stroke="#10a9ef" stroke-width="48" stroke-linecap="round"/>
+    <path d="M376 756 L419 714 L462 756" fill="none" stroke="#10a9ef" stroke-width="42" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- back image tile -->
+  <g filter="url(#shadow)">
+    <rect x="372" y="380" width="312" height="297" rx="29" fill="url(#backCard)"/>
+    <g clip-path="url(#backClip)">
+      <path d="M372 620 L437 551 Q454 535 469 551 L513 592 L556 527 Q569 511 584 527 L660 604 L684 626 L684 677 L372 677 Z" fill="url(#mountainDark)"/>
+      <path d="M372 620 L437 551 Q454 535 469 551 L556 638 L372 638 Z" fill="#0871dc" opacity="0.95"/>
+    </g>
+    <circle cx="463" cy="472" r="41" fill="url(#sun)" opacity="0.95"/>
+    <rect x="377" y="385" width="302" height="287" rx="24" fill="none" stroke="#6de4ff" stroke-opacity="0.35" stroke-width="4"/>
+  </g>
+
+  <!-- lower-left conversion arrow -->
+  <g fill="none" stroke="url(#arrow)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M493 815 H461 C438 815 419 800 419 777 V744" stroke-width="46"/>
+    <path d="M376 756 L419 714 L462 756" stroke-width="40"/>
+  </g>
+
+  <!-- upper-right conversion arrow -->
+  <g fill="none" stroke="url(#arrow2)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M730 412 H774 C809 412 832 436 832 468 V491" stroke-width="46"/>
+    <path d="M789 491 L831 535 L876 491" stroke-width="40"/>
+  </g>
+
+  <!-- front image tile -->
+  <g filter="url(#shadow)">
+    <rect x="548" y="554" width="331" height="307" rx="29" fill="url(#frontCard)"/>
+    <g clip-path="url(#frontClip)">
+      <path d="M647 807 L754 690 Q769 673 784 690 L879 784 L879 821 L651 821 Z" fill="url(#mountainLight)"/>
+      <path d="M548 812 L627 725 Q643 707 659 724 L759 821 L548 821 Z" fill="url(#mountainDark2)"/>
+    </g>
+    <circle cx="637" cy="646" r="42" fill="url(#sun)"/>
+    <rect x="553" y="559" width="321" height="297" rx="24" fill="none" stroke="#43aff7" stroke-opacity="0.40" stroke-width="4"/>
+  </g>
+</svg>

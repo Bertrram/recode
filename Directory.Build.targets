@@ -1,0 +1,16 @@
+<Project>
+
+  <!--
+    Projects that enable WPF end up with a reduced set of implicit usings that
+    leaves out System.IO. Adding it back has to happen here rather than in
+    Directory.Build.props, because props is imported before the WindowsDesktop
+    SDK removes it again.
+
+    Almost every class in this project reads or writes a file, so this is put
+    back once rather than repeated at the top of a dozen files.
+  -->
+  <ItemGroup Condition="'$(ImplicitUsings)' == 'enable' or '$(ImplicitUsings)' == 'true'">
+    <Using Include="System.IO" />
+  </ItemGroup>
+
+</Project>

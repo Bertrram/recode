@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 1,
+
+  "_comment": [
+    "Central format table. This file is the single source of truth for which formats",
+    "Recode knows about, which file extensions they use, which backend handles them,",
+    "and whether they can be read, written or both.",
+    "",
+    "It is compiled into Recode.Core as an embedded resource. The context menu",
+    "installer, the CLI '--list' output and the support window are all generated",
+    "from it. Nothing about the format matrix is hard coded anywhere else.",
+    "",
+    "Field reference:",
+    "  id               stable internal identifier, lowercase",
+    "  displayName      shown in menus, --list and the support window",
+    "  extensions       file extensions, lowercase, leading dot, first one is primary",
+    "  backend          id of an entry in the 'backends' array",
+    "  decoder          library that performs decoding, for display purposes",
+    "  encoder          library that performs encoding, for display purposes",
+    "  canRead          format may be used as a conversion source",
+    "  canWrite         format may be used as a conversion target",
+    "  supportsQuality  --quality applies to this format",
+    "  defaultQuality   quality used when --quality is not given, 1-100",
+    "  supportsAlpha    false means transparency is flattened onto white on write",
+    "  compression      libheif compression family, only meaningful for backend libheif"
+  ],
+
+  "backends": [
+    {
+      "id": "wic",
+      "displayName": "WIC",
+      "description": "Windows Imaging Component, part of Windows",
+      "bundled": false,
+      "libraries": []
+    },
+    {
+      "id": "libheif",
+      "displayName": "libheif",
+      "description": "libheif with libde265, kvazaar and libaom",
+      "bundled": true,
+      "libraries": [ "heif.dll" ]
+    },
+    {
+      "id": "libwebp",
+      "displayName": "libwebp",
+      "description": "Google libwebp",
+      "bundled": true,
+      "libraries": [ "libwebp.dll" ]
+    }
+  ],
+
+  "formats": [
+    {
+      "id": "jpeg",
+      "displayName": "JPEG",
+      "extensions": [ ".jpg", ".jpeg" ],
+      "backend": "wic",
+      "decoder": "WIC",
+      "encoder": "WIC",
+      "canRead": true,
+      "canWrite": true,
+      "supportsQuality": true,
+      "defaultQuality": 85,
+      "supportsAlpha": false
+    },
+    {
+      "id": "png",
+      "displayName": "PNG",
+      "extensions": [ ".png" ],
+      "backend": "wic",
+      "decoder": "WIC",
+      "encoder": "WIC",
+      "canRead": true,
+      "canWrite": true,
+      "supportsQuality": false,
+      "defaultQuality": 100,
+      "supportsAlpha": true
+    },
+    {
+      "id": "bmp",
+      "displayName": "BMP",
+      "extensions": [ ".bmp" ],
+      "backend": "wic",
+      "decoder": "WIC",
+      "encoder": "WIC",
+      "canRead": true,
+      "canWrite": true,
+      "supportsQuality": false,
+      "defaultQuality": 100,
+      "supportsAlpha": false
+    },
+    {
+      "id": "tiff",
+      "displayName": "TIFF",
+      "extensions": [ ".tif", ".tiff" ],
+      "backend": "wic",
+      "decoder": "WIC",
+      "encoder": "WIC",
+      "canRead": true,
+      "canWrite": true,
+      "supportsQuality": false,
+      "defaultQuality": 100,
+      "supportsAlpha": true
+    },
+    {
+      "id": "gif",
+      "displayName": "GIF",
+      "extensions": [ ".gif" ],
+      "backend": "wic",
+      "decoder": "WIC",
+      "encoder": "WIC",
+      "canRead": true,
+      "canWrite": true,
+      "supportsQuality": false,
+      "defaultQuality": 100,
+      "supportsAlpha": false
+    },
+    {
+      "id": "heic",
+      "displayName": "HEIC",
+      "extensions": [ ".heic" ],
+      "backend": "libheif",
+      "decoder": "libde265",
+      "encoder": "kvazaar",
+      "canRead": true,
+      "canWrite": true,
+      "supportsQuality": true,
+      "defaultQuality": 85,
+      "supportsAlpha": true,
+      "compression": "hevc"
+    },
+    {
+      "id": "heif",
+      "displayName": "HEIF",
+      "extensions": [ ".heif" ],
+      "backend": "libheif",
+      "decoder": "libde265",
+      "encoder": "kvazaar",
+      "canRead": true,
+      "canWrite": true,
+      "supportsQuality": true,
+      "defaultQuality": 85,
+      "supportsAlpha": true,
+      "compression": "hevc"
+    },
+    {
+      "id": "avif",
+      "displayName": "AVIF",
+      "extensions": [ ".avif" ],
+      "backend": "libheif",
+      "decoder": "libaom",
+      "encoder": "libaom",
+      "canRead": true,
+      "canWrite": true,
+      "supportsQuality": true,
+      "defaultQuality": 85,
+      "supportsAlpha": true,
+      "compression": "av1"
+    },
+    {
+      "id": "webp",
+      "displayName": "WebP",
+      "extensions": [ ".webp" ],
+      "backend": "libwebp",
+      "decoder": "libwebp",
+      "encoder": "libwebp",
+      "canRead": true,
+      "canWrite": true,
+      "supportsQuality": true,
+      "defaultQuality": 85,
+      "supportsAlpha": true
+    }
+  ]
+}

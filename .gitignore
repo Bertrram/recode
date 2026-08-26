@@ -1,0 +1,47 @@
+# Build output
+bin/
+obj/
+dist/
+
+# Native libraries and everything used to produce them.
+#
+# These are not committed. They are built from source by
+# tools/build-natives.ps1, which pins the upstream versions and passes the
+# licence critical build flags. A binary in git would be a binary nobody can
+# audit, and it would quietly become the real source of truth for what ships.
+native/
+.native-build/
+
+# Generated icon. Rebuilt from assets/*.svg by tools/make-icon.ps1.
+assets/app.ico
+
+# Signing material. A private key in a public repository is a private key that
+# has been published.
+*.pfx
+*.snk
+*.p12
+*.cer
+*.pvk
+
+# Visual Studio and Rider
+.vs/
+.idea/
+*.user
+*.suo
+*.userprefs
+_ReSharper*/
+
+# Test and coverage output
+[Tt]est[Rr]esult*/
+coverage*.xml
+coverage*.json
+*.coverage
+*.trx
+
+# NuGet
+*.nupkg
+packages/
+
+# Windows
+Thumbs.db
+desktop.ini
