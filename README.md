@@ -11,10 +11,6 @@ Nine formats, including the ones Windows makes difficult: HEIC from an iPhone,
 AVIF from the web, WebP from anywhere. Everything needed is bundled. There is
 nothing to fetch from the Microsoft Store.
 
-<p align="center">
-  <img src="docs/context-menu.png" alt="The Convert to submenu open in Explorer, listing JPG, JPEG, PNG, BMP, TIF, TIFF, GIF, HEIF, AVIF and WebP" width="620">
-</p>
-
 ## The problem
 
 Windows opens HEIC photographs from an iPhone only if you install a codec from
