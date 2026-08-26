@@ -15,6 +15,9 @@ native/
 # Generated icon. Rebuilt from assets/*.svg by tools/make-icon.ps1.
 assets/app.ico
 
+# Full screen captures, before they are cropped into a documentation image.
+docs/*-raw.png
+
 # Signing material. A private key in a public repository is a private key that
 # has been published.
 *.pfx

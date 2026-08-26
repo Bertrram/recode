@@ -11,6 +11,17 @@ Nine formats, including the ones Windows makes difficult: HEIC from an iPhone,
 AVIF from the web, WebP from anywhere. Everything needed is bundled. There is
 nothing to fetch from the Microsoft Store.
 
+<p align="center">
+  <img src="docs/context-menu.png"
+       alt="The Windows 11 context menu with Convert to selected and its submenu open, listing PNG, BMP, TIF, TIFF, GIF, HEIC, HEIF, AVIF, WebP and Format support"
+       width="620">
+</p>
+
+<p align="center">
+  <sub>The file here is a JPEG, so JPG and JPEG are absent from the submenu.
+  A format is never offered a conversion to itself.</sub>
+</p>
+
 ## The problem
 
 Windows opens HEIC photographs from an iPhone only if you install a codec from
