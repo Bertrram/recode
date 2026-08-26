@@ -43,11 +43,18 @@ function Resolve-Executable([string] $Requested) {
         return (Resolve-Path $Requested).Path
     }
 
+    $architecture = if ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64') { 'arm64' } else { 'x64' }
+
     $candidates = @(
-        (Join-Path $PSScriptRoot 'recode.exe'),
-        (Join-Path $PSScriptRoot '..\dist\recode.exe'),
-        (Join-Path $PSScriptRoot '..\src\Recode.App\bin\Release\net8.0-windows\win-arm64\recode.exe'),
-        (Join-Path $PSScriptRoot '..\src\Recode.App\bin\Release\net8.0-windows\win-x64\recode.exe')
+        # An unpacked release, where tools sits beside the executable.
+        (Join-Path $PSScriptRoot '..\recode.exe'),
+
+        # A working copy, after dotnet publish.
+        (Join-Path $PSScriptRoot "..\dist\$architecture\recode.exe"),
+
+        # A working copy, after dotnet build.
+        (Join-Path $PSScriptRoot "..\src\Recode.App\bin\Release\net8.0-windows\win-$architecture\recode.exe"),
+        (Join-Path $PSScriptRoot '..\src\Recode.App\bin\Release\net8.0-windows\recode.exe')
     )
 
     foreach ($candidate in $candidates) {

@@ -35,8 +35,14 @@ $Clsid = '018E5409-E5B6-4961-8779-67741A425A20'
 if (-not $Architecture) {
     $Architecture = if ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64') { 'arm64' } else { 'x64' }
 }
+# Same two layouts as the installer: an unpacked release keeps everything in one
+# folder, a working copy keeps it under dist\<architecture>.
 if (-not $PayloadDirectory) {
-    $PayloadDirectory = Join-Path $RepoRoot "dist\$Architecture"
+    $PayloadDirectory = if (Test-Path (Join-Path $RepoRoot 'recode.exe')) {
+        $RepoRoot
+    } else {
+        Join-Path $RepoRoot "dist\$Architecture"
+    }
 }
 
 $problems = [System.Collections.Generic.List[string]]::new()

@@ -62,9 +62,28 @@ $PackageIdentityName = 'BertramBechLarsen.Recode'
 if (-not $Architecture) {
     $Architecture = if ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64') { 'arm64' } else { 'x64' }
 }
-if (-not $PayloadDirectory) { $PayloadDirectory = Join-Path $RepoRoot "dist\$Architecture" }
-if (-not $PackagePath)     { $PackagePath     = Join-Path $RepoRoot "dist\Recode-$Architecture.msix" }
-if (-not $CertificatePath) { $CertificatePath = Join-Path $RepoRoot 'dist\Recode.cer' }
+# Two layouts. An unpacked release has everything in one folder with tools
+# beside it. A working copy has it under dist\<architecture>. Whichever holds
+# recode.exe is the one meant.
+$Distribution = Test-Path (Join-Path $RepoRoot 'recode.exe')
+
+if (-not $PayloadDirectory) {
+    $PayloadDirectory = if ($Distribution) { $RepoRoot } else { Join-Path $RepoRoot "dist\$Architecture" }
+}
+if (-not $PackagePath) {
+    $PackagePath = if ($Distribution) {
+        Join-Path $RepoRoot "Recode-$Architecture.msix"
+    } else {
+        Join-Path $RepoRoot "dist\Recode-$Architecture.msix"
+    }
+}
+if (-not $CertificatePath) {
+    $CertificatePath = if ($Distribution) {
+        Join-Path $RepoRoot 'Recode.cer'
+    } else {
+        Join-Path $RepoRoot 'dist\Recode.cer'
+    }
+}
 
 function Write-Stage([string] $Message) {
     Write-Host ''
